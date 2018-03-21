@@ -102,10 +102,14 @@ class RegisterService extends \Shopware\Bundle\AccountBundle\Service\RegisterSer
         $customer->setFirstname($user->getFirstName());
         $customer->setLastname($user->getLastName());
         // we generate the password here, because we have no password
-        // due the SSO mechanism and we will not neet it in future
+        // due the SSO mechanism and we will not need it in future
         // But SW needs it :-)
         $password = uniqid();
         $customer->setPassword($password);
+
+        if ($user->getBirthday() !== null) {
+            $customer->setBirthday($user->getBirthday());
+        }
 
         $billing = new Address();
         $billing->setCompany($user->getCompany());

@@ -81,6 +81,11 @@ class User
     private $company = '';
 
     /**
+     * @var \DateTime
+     */
+    private $birthday = null;
+
+    /**
      * User constructor.
      *
      * @param string $id
@@ -316,5 +321,21 @@ class User
     public function setCompany($company)
     {
         $this->company = $company;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getBirthday()
+    {
+        return $this->birthday;
+    }
+
+    /**
+     * @param \DateTime $birthday
+     */
+    public function setBirthday(\DateTime $birthday)
+    {
+        $this->birthday = $birthday;
     }
 }
