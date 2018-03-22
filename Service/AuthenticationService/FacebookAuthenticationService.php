@@ -34,15 +34,25 @@ class FacebookAuthenticationService extends AbstractAuthenticationService
                         && $user !== null
                     ) {
                         $userPrf = $this->getUserProfile();
-                        $birthDay = strlen((string) $userPrf->birthDay) === 1
-                            ? '0'.$userPrf->birthDay
-                            : (string) $userPrf->birthDay;
-                        $birthMonth = strlen((string) $userPrf->birthMonth) === 1
-                            ? '0'.$userPrf->birthMonth
-                            : (string )$userPrf->birthMonth;
 
-                        $dtBirthday = new \DateTime(sprintf('%s-%s-%s', $userPrf->birthYear, $birthMonth, $birthDay));
-                        $user->setBirthday($dtBirthday);
+                        if (
+                            !empty($userPrf->birthDay)
+                            && !empty($userPrf->birthMonth)
+                            && !empty($userPrf->birthYear)
+                        ) {
+                            // can be empty, if not public accessibility is set
+                            $birthDay = strlen((string) $userPrf->birthDay) === 1
+                                ? '0'.$userPrf->birthDay
+                                : (string) $userPrf->birthDay;
+                            $birthMonth = strlen((string) $userPrf->birthMonth) === 1
+                                ? '0'.$userPrf->birthMonth
+                                : (string) $userPrf->birthMonth;
+
+                            $dtBirthday = new \DateTime(
+                                sprintf('%s-%s-%s', $userPrf->birthYear, $birthMonth, $birthDay)
+                            );
+                            $user->setBirthday($dtBirthday);
+                        }
                     }
 
                     break;
