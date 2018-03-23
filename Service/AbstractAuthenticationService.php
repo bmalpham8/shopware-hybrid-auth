@@ -102,7 +102,6 @@ abstract class AbstractAuthenticationService implements AuthenticationServiceInt
      */
     public function getUser()
     {
-
         $user = null;
 
         if ($this->isAuthenticated()) {
@@ -166,6 +165,48 @@ abstract class AbstractAuthenticationService implements AuthenticationServiceInt
 
                     if (empty($userProfil->organization_name) === false) {
                         $user->setCompany($userProfil->organization_name);
+                    }
+                }
+
+                $config = $this->configurationService->getProviderConfiguration($this->provider);
+
+                if (
+                    array_key_exists('providers', $config)
+                    && is_array($config['providers'])
+                    && count($config['providers']) > 0
+                ) {
+                    foreach ($config['providers'] as $providerName => $provider) {
+                        if ($providerName === $this->provider) {
+                            if (
+                                $provider['enabled']
+                                && (isset($this->scopeBirthday) && in_array($this->scopeBirthday, $provider['scope']) || !isset($this->scopeBirthday))
+                                && $user !== null
+                            ) {
+                                $userProfil = $this->getUserProfile();
+
+                                if (
+                                    !empty($userProfil->birthDay)
+                                    && !empty($userProfil->birthMonth)
+                                    && !empty($userProfil->birthYear)
+                                ) {
+                                    // can be empty, if not public accessibility is set
+                                    $birthDay = strlen((string) $userProfil->birthDay) === 1
+                                        ? '0'.$userProfil->birthDay
+                                        : (string) $userProfil->birthDay;
+                                    $birthMonth = strlen((string) $userProfil->birthMonth) === 1
+                                        ? '0'.$userProfil->birthMonth
+                                        : (string) $userProfil->birthMonth;
+
+                                    $dtBirthday = new \DateTime(
+                                        sprintf('%s-%s-%s', $userProfil->birthYear, $birthMonth, $birthDay)
+                                    );
+
+                                    $user->setBirthday($dtBirthday);
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
             }

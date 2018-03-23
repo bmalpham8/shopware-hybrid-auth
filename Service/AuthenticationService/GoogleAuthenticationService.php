@@ -10,5 +10,4 @@ use Port1HybridAuth\Service\AbstractAuthenticationService;
  */
 class GoogleAuthenticationService extends AbstractAuthenticationService
 {
-
 }
