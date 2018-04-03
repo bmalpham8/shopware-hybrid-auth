@@ -29,6 +29,11 @@ class ConfigurationService implements ConfigurationServiceInterface
     protected $snippetManager;
 
     /**
+     * @var string
+     */
+    protected $path;
+
+    /**
      * ConfigurationService constructor.
      *
      * @param ContextServiceInterface $context
@@ -110,6 +115,36 @@ class ConfigurationService implements ConfigurationServiceInterface
 
         if ($this->isProviderEnabled($provider)) {
             $result = $this->getProviderConfigurationFromConfigFile($provider);
+
+            if (strtolower($provider) === 'amazon') {
+                // usually way, if it would work:
+//        $result['providers'][$this->provider]['wrapper']['path'] = sprintf(
+//            '%2$sProviders%2$sAmazon.php',
+//            $basePath,
+//            DIRECTORY_SEPARATOR
+//        );
+//        $result['providers'][$this->provider]['wrapper']['class'] = \Hybrid_Providers_Amazon::class;
+
+                $basePath = sprintf(
+                    '%1$svendor%2$shybridauth%2$shybridauth%2$sadditional-providers%2$shybridauth-amazon',
+                    $this->getPath(),
+                    DIRECTORY_SEPARATOR
+                );
+
+                $result['providers'][$provider]['wrapper']['path'] = sprintf(
+                    '%1$sResources%2$sFixedProvidersAmazon.php',
+                    $this->getPath(),
+                    DIRECTORY_SEPARATOR
+                );
+
+                $result['providers'][$provider]['wrapper']['class'] = 'FixedProvidersAmazon';
+
+                $result['providers'][$provider]['path_libraries'] = sprintf(
+                    '%1$s%2$sthirdparty',
+                    $basePath,
+                    DIRECTORY_SEPARATOR
+                );
+            }
         }
 
         return $result;
@@ -195,6 +230,23 @@ class ConfigurationService implements ConfigurationServiceInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Gets the Plugin directory path.
+     *
+     * @return string The Plugin absolute path
+     */
+    final public function getPath()
+    {
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $dirs = explode(DIRECTORY_SEPARATOR, dirname($reflected->getFileName()));
+            unset($dirs[count($dirs) - 1]);
+            $this->path = implode(DIRECTORY_SEPARATOR, $dirs) . DIRECTORY_SEPARATOR;
+        }
+
+        return $this->path;
     }
 
     /**

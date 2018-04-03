@@ -216,6 +216,26 @@ abstract class AbstractAuthenticationService implements AuthenticationServiceInt
     }
 
     /**
+     * Get system-independent base plugin path (with ending DIRECTORY_SEPARATOR).
+     * E. g. /path/to/my/plugin/ or C:\\path\\to\\my\\plugin\\
+     *
+     * @return string
+     */
+    protected final function getPath()
+    {
+        $reflected = new \ReflectionObject($this);
+        $path = dirname($reflected->getFileName());
+
+        $path = str_replace('Service', '' , str_replace('AuthenticationService', '', $path));
+
+        while (strrpos($path, DIRECTORY_SEPARATOR) === strlen($path) - 1) {
+            $path = substr($path, 0, strlen($path) - 2);
+        }
+
+        return $path . DIRECTORY_SEPARATOR;
+    }
+
+    /**
      *
      * @return boolean true if the user is authenticated
      */
