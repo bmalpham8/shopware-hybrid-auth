@@ -42,7 +42,13 @@ class AccountService implements AccountServiceInterface
      */
     public function checkUser()
     {
-        return $this->admin->sCheckUser();
+        $mail = $this->container->get('session')->offsetGet('sUserMail');
+
+        if (empty($mail)) {
+            return false;
+        }
+
+        return $this->admin->sGetUserByMail($mail) > 0;
     }
 
     /**
